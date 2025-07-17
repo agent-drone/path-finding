@@ -1,0 +1,7 @@
+[project]
+name = "preflight-play-repo"
+version = "0.1.0"
+description = "Pre-flight plan repo using octrees"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
