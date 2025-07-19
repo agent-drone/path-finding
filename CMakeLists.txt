@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.14)
-project(MyProject)
+project(ALEOS)
 find_package(octomap REQUIRED)
 
-add_executable(my_app main.cpp)
-target_link_libraries(my_app PRIVATE octomap)
+include_directories(include)
+file(GLOB sources "src/*.cpp")
+
+add_executable(pathfinder main.cpp ${sources})
+target_link_libraries(pathfinder PRIVATE octomap)
