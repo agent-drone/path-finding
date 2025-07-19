@@ -1,7 +1,16 @@
 [project]
 name = "preflight-play-repo"
 version = "0.1.0"
-description = "Pre-flight plan repo using octrees"
+description = "Pre-flight plan repo using OcTrees"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "numpy>=2.3.1",
+    "open3d>=0.19.0",
+    "pybind11>=3.0.0",
+    "pytest>=8.4.1",
+]
+
+[build-system]
+requires = ["pybind11", "setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
