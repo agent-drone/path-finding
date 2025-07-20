@@ -3,8 +3,9 @@
 #include "common.h"
 
 /**
- * @brief: A function for reading point cloud data from a text file, in ASCII
+ * @brief A function for reading point cloud data from a text file, in ASCII
  * format.
+ * @param file: A string pointing to the filepath; example: `./point_data.txt`.
  */
 bool read_ascii_file (const char *file, OCTREE * tree);
 
@@ -21,5 +22,5 @@ public:
   void read_from_text (const char *file);
   void read_from_bt (const char *file);
   void add_point (float x, float y, float z, uint8 occupied);
-  bool occupied (float x, float y, float z);
+  bool free (float x, float y, float z);
 };

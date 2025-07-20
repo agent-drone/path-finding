@@ -9,9 +9,6 @@ DESCRIPTION
 
 import ctypes
 
-# @TODO: implement the actual wrapper routine
-# for `Woctomap`.
-
 class Octomap:
     def __init__(self):
         pass

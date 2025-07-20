@@ -67,12 +67,12 @@ Woctomap::add_point (float x, float y, float z, uint8 occupied)
 }
 
 bool
-Woctomap::occupied (float x, float y, float z)
+Woctomap::free (float x, float y, float z)
 {
   octomap::OcTreeNode * on = otree.search (POINT (x, y, z));
-  if (on != NULL)
-    return false;
+  if (on == NULL)
+    return true;
 
   bool occupied = otree.isNodeOccupied (on);
-  return occupied;
+  return !occupied;
 }
