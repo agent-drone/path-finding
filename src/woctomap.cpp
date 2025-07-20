@@ -76,3 +76,8 @@ Woctomap::free (float x, float y, float z)
   bool occupied = otree.isNodeOccupied (on);
   return !occupied;
 }
+
+void
+Woctomap::save_to_bt(const char* file) {
+  otree.writeBinary(file);
+}

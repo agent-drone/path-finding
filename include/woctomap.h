@@ -22,5 +22,6 @@ public:
   void read_from_text (const char *file);
   void read_from_bt (const char *file);
   void add_point (float x, float y, float z, uint8 occupied);
+  void save_to_bt(const char *file);
   bool free (float x, float y, float z);
 };
