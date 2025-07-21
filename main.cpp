@@ -8,6 +8,7 @@ DESCRIPTION
 
 #include "include/common.h"
 #include "include/woctomap.h"
+#include "include/wompl.h"
 
 #include <octomap/octomap.h>
 #include <octomap/OcTree.h>
@@ -16,35 +17,11 @@ DESCRIPTION
 #include <stdio.h>
 
 int main() {
-  Woctomap wp(0.1);
-  wp.read_from_bt("data/dubdub.bt");
-  /* do OMPL shit here. */
+  Woctomap wp("./data/dubdub.bt");
 
-  double sx, sy, sz;
-  double gx, gy, gz;
-  wp.otree.getMetricMin(sx, sy, sz);
-  wp.otree.getMetricMax(gx, gy, gz);
-
-  printf("[ %f, %f, %f ]\n", sx, sy, sz);
-
-  // bool path = ss.solve(20);
-  // if (!path) return 0;
-
-  // // ss.simplifySolution();
-  // auto pts = ss.getSolutionPath();
-
-  // // @TODO: iterate  and see all the generated points
-  // // !path
-  // for (int i = 0; i < pts.getStateCount(); i++) {
-  //   float x, y, z;
-  //   auto *cstate = pts.getState(i)->as<ob::RealVectorStateSpace::StateType>();
-  //   x = cstate->values[0];
-  //   y = cstate->values[1];
-  //   z = cstate->values[2];
-  //   wp.otree.updateNode(POINT(x,y,z), false);
-  //   printf("[ %f %f %f ]\n", x,y,z);
-    
-  // }
-  
-  // wp.otree.writeBinary("path.bt");
+  Wompl mp(std::make_shared<Woctomap>(wp));
+  mp.set_start(-50, 0, 6.5);
+  mp.set_goal(60, 0, 5);
+  mp.criterion(0.05, 5);
+  mp.solve(20.0);
 }

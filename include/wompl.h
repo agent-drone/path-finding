@@ -23,5 +23,7 @@ public:
   Wompl(std::shared_ptr<Woctomap> swp);
   void set_start(double x, double y, double z);
   void set_goal(double x, double y, double z);
-  double** compute_waypoints(float sampling_dist, float minimum_free_volume);
+  void criterion(double sampling_dist, double minimum_volume);
+  bool solve(float limit);
+  std::vector<std::array<double, 3>> get_computed_waypoints();
 };

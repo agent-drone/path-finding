@@ -19,6 +19,7 @@ class Woctomap
 public:
   OCTREE otree;
   Woctomap (float size = 0.1);
+  Woctomap (const char* file);
   void read_from_text (const char *file);
   void read_from_bt (const char *file);
   void add_point (float x, float y, float z, uint8 occupied);
