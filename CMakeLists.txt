@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(AIeOS)
 
+set(BUILD_SHARED_LIBS OFF)
+
 find_package(ompl REQUIRED)
 find_package(octomap REQUIRED)
 find_package(pybind11 REQUIRED)

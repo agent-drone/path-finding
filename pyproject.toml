@@ -1,16 +1,15 @@
 [project]
-name = "preflight-play-repo"
+name = "pathfinder"
 version = "0.1.0"
-description = "Pre-flight plan repo using OcTrees"
+description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "numpy>=2.3.1",
-    "open3d>=0.19.0",
+    "auditwheel>=6.4.1",
+    "cibuildwheel>=3.0.1",
+    "patchelf>=0.17.2.2",
     "pybind11>=3.0.0",
-    "pytest>=8.4.1",
+    "setuptools>=80.9.0",
+    "twine>=6.1.0",
+    "wheel>=0.45.1",
 ]
-
-[build-system]
-requires = ["pybind11", "setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
