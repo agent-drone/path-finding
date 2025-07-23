@@ -40,8 +40,8 @@ jobs:
           cd ./vcpkg
           git pull
           cd ..
-          ./vcpkg/vcpkg update
           ./vcpkg/bootstrap-vcpkg.sh
+          ./vcpkg/vcpkg update
           ./vcpkg/vcpkg install ompl octomap pybind11
 
       - name: Install Python build tools
