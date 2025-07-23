@@ -15,6 +15,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./vcpkg/installed
+            ./vcpkg/buildtrees
+            ./vcpkg/packages
+            ./vcpkg/downloads
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+
       - name: Install Python & cibuildwheel
         run: |
           python -m pip install cibuildwheel
