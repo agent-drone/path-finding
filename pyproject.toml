@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core[pyproject]"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "pathfinder"
 version = "1.0.0"
-description = ""
-readme = ""
-requires-python = "==3.12.8"
+description = "Pathfinder is a wrapper over the famous Octomap and OMPL libraries."
+readme = "README.md"
+requires-python = ">=3.11"
 license = {text = "UNKNOWN"}
 authors = []
 dependencies = [
@@ -15,14 +15,14 @@ dependencies = [
     "cibuildwheel>=3.0.1",
     "patchelf>=0.17.2.2",
     "pybind11>=3.0.0",
+    "scikit-build-core[pyproject]>=0.11.5",
     "setuptools>=80.9.0",
     "twine>=6.1.0",
     "wheel>=0.45.1",
 ]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["*"]
-
-[tool.setuptools]
-include-package-data = true
+[tool.scikit-build]
+build-dir = "build"
+wheel.packages = ["pathfinder"]
+cmake.verbose = true
+cmake.minimum-version = "3.15"

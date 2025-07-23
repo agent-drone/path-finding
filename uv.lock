@@ -402,13 +402,14 @@ wheels = [
 
 [[package]]
 name = "pathfinder"
-version = "0.1.0"
-source = { virtual = "." }
+version = "1.0.0"
+source = { editable = "." }
 dependencies = [
     { name = "auditwheel" },
     { name = "cibuildwheel" },
     { name = "patchelf" },
     { name = "pybind11" },
+    { name = "scikit-build-core" },
     { name = "setuptools" },
     { name = "twine" },
     { name = "wheel" },
@@ -420,9 +421,19 @@ requires-dist = [
     { name = "cibuildwheel", specifier = ">=3.0.1" },
     { name = "patchelf", specifier = ">=0.17.2.2" },
     { name = "pybind11", specifier = ">=3.0.0" },
+    { name = "scikit-build-core", extras = ["pyproject"], specifier = ">=0.11.5" },
     { name = "setuptools", specifier = ">=80.9.0" },
     { name = "twine", specifier = ">=6.1.0" },
     { name = "wheel", specifier = ">=0.45.1" },
+]
+
+[[package]]
+name = "pathspec"
+version = "0.12.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ca/bc/f35b8446f4531a7cb215605d100cd88b7ac6f44ab3fc94870c120ab3adbf/pathspec-0.12.1.tar.gz", hash = "sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712", size = 51043, upload-time = "2023-12-10T22:30:45Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cc/20/ff623b09d963f88bfde16306a54e12ee5ea43e9b597108672ff3a408aad6/pathspec-0.12.1-py3-none-any.whl", hash = "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08", size = 31191, upload-time = "2023-12-10T22:30:43.14Z" },
 ]
 
 [[package]]
@@ -540,6 +551,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a1/53/830aa4c3066a8ab0ae9a9955976fb770fe9c6102117c8ec4ab3ea62d89e8/rich-14.0.0.tar.gz", hash = "sha256:82f1bc23a6a21ebca4ae0c45af9bdbc492ed20231dcb63f297d6d1021a9d5725", size = 224078, upload-time = "2025-03-30T14:15:14.23Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0d/9b/63f4c7ebc259242c89b3acafdb37b41d1185c07ff0011164674e9076b491/rich-14.0.0-py3-none-any.whl", hash = "sha256:1c9491e1951aac09caffd42f448ee3d04e58923ffe14993f6e83068dc395d7e0", size = 243229, upload-time = "2025-03-30T14:15:12.283Z" },
+]
+
+[[package]]
+name = "scikit-build-core"
+version = "0.11.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "pathspec" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/00/3c/57152788a76e38947647e30ded96ad3a623e735c40c6bfd342c0bed1ebd0/scikit_build_core-0.11.5.tar.gz", hash = "sha256:8f0a1edb86cb087876f3c699d2a2682012efd8867b390ed37355f13949d0628e", size = 285500, upload-time = "2025-06-27T04:49:59.03Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/45/23/0ffa0df7550ca0535f6e03b9a9ab2bf0495ac62e15fd322544c98321a10c/scikit_build_core-0.11.5-py3-none-any.whl", hash = "sha256:fada727b49f6c34f943bd52773a130bbd1f9b322d751251048ddbe2f4ce92761", size = 185664, upload-time = "2025-06-27T04:49:57.226Z" },
 ]
 
 [[package]]
