@@ -39,8 +39,8 @@ jobs:
           fi
           cd ./vcpkg
           git pull
-          ./vckpkg update
           cd ..
+          ./vcpkg/vckpkg update
           ./vcpkg/bootstrap-vcpkg.sh
           ./vcpkg/vcpkg install ompl octomap pybind11
 
