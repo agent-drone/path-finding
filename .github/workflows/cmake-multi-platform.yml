@@ -33,38 +33,18 @@ jobs:
           # or on the macOS/Windows runner directly (if you add them to the matrix).
 
           # For Linux (manylinux) builds:
-          CIBW_BEFORE_ALL_LINUX: |
+          CIBW_BEFORE_ALL_LINUX: >
             # Update system packages and install git and cmake
-            yum update -y && yum install -y git cmake unzip
+            yum update -y && yum install -y git cmake unzip &&
 
             # Clone vcpkg within the container's temporary workspace
-            git clone https://github.com/microsoft/vcpkg.git /tmp/vcpkg
-            # Bootstrap vcpkg
-            /tmp/vcpkg/bootstrap-vcpkg.sh
-            # Install dependencies with vcpkg
-            /tmp/vcpkg/vcpkg install ompl octomap pybind11
+            git clone https://github.com/microsoft/vcpkg.git /tmp/vcpkg &&
+            /tmp/vcpkg/bootstrap-vcpkg.sh &&
+            /tmp/vcpkg/vcpkg install ompl octomap pybind11 &&
 
-            # Set the toolchain file for CMake to find dependencies installed by vcpkg
-            export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
-            # If your project also uses vcpkg configuration (e.g., via CMake presets or a separate vcpkg.json)
-            # you might also need to set VCPKG_ROOT:
-            export VCPKG_ROOT=/tmp/vcpkg
-            # Ensure vcpkg toolchain is discoverable by CMake
-            export CMAKE_PREFIX_PATH="/tmp/vcpkg/installed/x64-linux/debug;/tmp/vcpkg/installed/x64-linux/release:${CMAKE_PREFIX_PATH}" # Add paths for vcpkg installed libs
-
-          # Add similar CIBW_BEFORE_ALL_MACOS and CIBW_BEFORE_ALL_WINDOWS
-          # to expand your build matrix to those platforms.
-          # For macOS, use 'brew install' or vcpkg with Homebrew.
-          # For Windows, vcpkg would run directly on the Windows runner.
-          # Example for macOS (if you add 'macos-latest' to matrix):
-          # CIBW_BEFORE_ALL_MACOS: |
-          #   brew update
-          #   brew install cmake git
-          #   git clone https://github.com/microsoft/vcpkg.git /tmp/vcpkg
-          #   /tmp/vcpkg/bootstrap-vcpkg.sh
-          #   /tmp/vcpkg/vcpkg install ompl octomap pybind11 --triplet x64-osx # Or appropriate triplet
-          #   export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
-          #   export VCPKG_ROOT=/tmp/vcpkg
+            export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake &&
+            export VCPKG_ROOT=/tmp/vcpkg &&
+            export CMAKE_PREFIX_PATH="/tmp/vcpkg/installed/x64-linux/debug;/tmp/vcpkg/installed/x64-linux/release:${CMAKE_PREFIX_PATH}" 
 
         run: |
           python -m cibuildwheel --output-dir wheelhouse
