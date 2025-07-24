@@ -42,14 +42,14 @@ jobs:
         env:
           CIBW_BEFORE_ALL_LINUX: |
             yum install -y epel-release
-            yum install -y cmake make gcc-c++ wget git bzip2
+            yum install -y cmake make gcc-c++ bzip2 wget git tar
             
             BOOST_VERSION=1.84.0
             BOOST_DIR=boost_${BOOST_VERSION//./_}
             wget -q https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/${BOOST_DIR}.tar.bz2
             tar --bzip2 -xf ${BOOST_DIR}.tar.bz2
             cd ${BOOST_DIR}
-            ./bootstrap.sh --prefix=/usr/local
+            ./bootstrap.sh --with-libraries=filesystem,serialization,system --prefix=/usr/local
             ./b2 install -j$(nproc)
             cd ..
     
