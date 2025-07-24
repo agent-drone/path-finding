@@ -22,6 +22,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install scikit-build-core[pyproject] cibuildwheel setuptools wheel
 
+      - name: Restore VCPKG cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            /tmp/vcpkg/installed
+            /tmp/vcpkg/buildtrees
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-
+
       - name: Build wheels with cibuildwheel
         env:
           CIBW_SKIP: "pp* *-musllinux*" # Skip PyPy and musllinux builds
