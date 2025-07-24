@@ -35,8 +35,7 @@ jobs:
           # For Linux (manylinux) builds:
           CIBW_BEFORE_ALL_LINUX: >
             yum update -y &&
-            yum install -y git cmake unzip curl tar zip 
-            kernel-devel-$(uname -r) perl-IPC-Cmd &&
+            yum install -y git cmake unzip curl tar zip perl-IPC-Cmd &&
             git clone https://github.com/microsoft/vcpkg.git /tmp/vcpkg &&
             /tmp/vcpkg/bootstrap-vcpkg.sh &&
             /tmp/vcpkg/vcpkg install ompl octomap pybind11 &&
