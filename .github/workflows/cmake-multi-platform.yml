@@ -1,64 +1,166 @@
 name: Build Wheels
-
 on:
   push:
     branches: [main]
   pull_request:
-
 jobs:
   build_wheels:
-    runs-on: ubuntu-latest # This runner will host the cibuildwheel Docker containers
-
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.11', '3.12']
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # Note: vcpkg caching might be tricky with cibuildwheel's isolated environments.
-      # For simplicity, vcpkg will be reinstalled within each build step.
-      # Consider creating a custom cibuildwheel Docker image or exploring more advanced caching mechanisms that mount into the container if builds are too slow.
-
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          
       - name: Install Python build tools
         run: |
           python -m pip install --upgrade pip
           pip install scikit-build-core[pyproject] cibuildwheel setuptools wheel
-
-      - name: Restore VCPKG cache
+          
+      # Improved vcpkg caching strategy
+      - name: Get vcpkg commit hash
+        id: vcpkg-commit
+        shell: bash
+        run: |
+          # Get the latest stable vcpkg commit hash for better cache stability
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            echo "hash=$(curl -s https://api.github.com/repos/microsoft/vcpkg/commits/master | jq -r '.sha[:8]')" >> $GITHUB_OUTPUT
+          else
+            echo "hash=$(curl -s https://api.github.com/repos/microsoft/vcpkg/commits/master | jq -r '.sha[:8]')" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Cache vcpkg
         uses: actions/cache@v4
         with:
           path: |
-            /tmp/vcpkg/installed
-            /tmp/vcpkg/buildtrees
-          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+            ${{ runner.os == 'Windows' && 'C:\vcpkg' || '/tmp/vcpkg' }}
+          key: vcpkg-${{ matrix.os }}-${{ matrix.python-version }}-${{ steps.vcpkg-commit.outputs.hash }}-${{ hashFiles('vcpkg.json', '**/vcpkg.json') }}
           restore-keys: |
-            vcpkg-${{ runner.os }}-
-
+            vcpkg-${{ matrix.os }}-${{ matrix.python-version }}-${{ steps.vcpkg-commit.outputs.hash }}-
+            vcpkg-${{ matrix.os }}-${{ matrix.python-version }}-
+            vcpkg-${{ matrix.os }}-
+            
       - name: Build wheels with cibuildwheel
         env:
-          # CIBW_SKIP: "pp* *-musllinux*" # Skip PyPy and musllinux builds
-          CIBW_BUILD: "cp311-*"         # Only build for CPython 3.11
+          CIBW_SKIP: "pp* *-musllinux*" # Skip PyPy and musllinux builds
+          CIBW_BUILD: "cp3{11,12}-*" # Build for both Python 3.11 and 3.12
           
-          # --- Environment variables for cibuildwheel's build environment ---
-          # These commands run INSIDE the cibuildwheel Docker container (for Linux)
-          # which typically uses a manylinux image (often CentOS-based, hence yum)
-          # or on the macOS/Windows runner directly (if you add them to the matrix).
-
-          # For Linux (manylinux) builds:
-          CIBW_BEFORE_ALL_LINUX: >
-            yum update -y &&
-            yum install -y git autoconf automake libtool m4 pkgconfig cmake unzip curl tar zip perl-IPC-Cmd &&
-            git clone https://github.com/microsoft/vcpkg.git /tmp/vcpkg &&
-            /tmp/vcpkg/bootstrap-vcpkg.sh &&
-            export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake &&
-            export VCPKG_ROOT=/tmp/vcpkg &&
-            export CMAKE_PREFIX_PATH="/tmp/vcpkg/installed/x64-linux/debug;/tmp/vcpkg/installed/x64-linux/release:${CMAKE_PREFIX_PATH}" 
-
+          # Linux-specific setup (manylinux)
+          CIBW_BEFORE_ALL_LINUX: |
+            set -ex
+            # Update package manager and install essential tools
+            yum update -y
+            yum install -y git autoconf automake libtool m4 pkg-config cmake unzip curl tar zip perl-IPC-Cmd which
+            
+            # Setup vcpkg with better error handling
+            if [ ! -d "/tmp/vcpkg" ]; then
+              git clone --depth 1 https://github.com/microsoft/vcpkg.git /tmp/vcpkg
+              /tmp/vcpkg/bootstrap-vcpkg.sh
+            fi
+            
+            # Set vcpkg environment variables
+            export VCPKG_ROOT=/tmp/vcpkg
+            export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
+            
+            # Install dependencies with triplet specification for better reliability
+            /tmp/vcpkg/vcpkg install ompl:x64-linux octomap:x64-linux pybind11:x64-linux
+            
+            # Verify installations
+            /tmp/vcpkg/vcpkg list
+            
+          # Windows-specific setup
+          CIBW_BEFORE_ALL_WINDOWS: |
+            # Install vcpkg
+            if not exist "C:\vcpkg" (
+              git clone --depth 1 https://github.com/microsoft/vcpkg.git C:\vcpkg
+              C:\vcpkg\bootstrap-vcpkg.bat
+            )
+            
+            # Set environment variables
+            set VCPKG_ROOT=C:\vcpkg
+            set CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
+            
+            # Install dependencies
+            C:\vcpkg\vcpkg install ompl:x64-windows octomap:x64-windows pybind11:x64-windows
+            
+            # Verify installations
+            C:\vcpkg\vcpkg list
+            
+          # macOS-specific setup
+          CIBW_BEFORE_ALL_MACOS: |
+            set -ex
+            # Install dependencies using Homebrew first (faster than vcpkg for some packages)
+            brew update
+            brew install cmake autoconf automake libtool pkg-config
+            
+            # Setup vcpkg
+            if [ ! -d "/tmp/vcpkg" ]; then
+              git clone --depth 1 https://github.com/microsoft/vcpkg.git /tmp/vcpkg
+              /tmp/vcpkg/bootstrap-vcpkg.sh
+            fi
+            
+            # Set vcpkg environment variables
+            export VCPKG_ROOT=/tmp/vcpkg
+            export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
+            
+            # Install dependencies
+            /tmp/vcpkg/vcpkg install ompl:x64-osx octomap:x64-osx pybind11:x64-osx
+            
+            # Verify installations
+            /tmp/vcpkg/vcpkg list
+            
+          # Environment variables for each platform
+          CIBW_ENVIRONMENT_LINUX: |
+            VCPKG_ROOT=/tmp/vcpkg
+            CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
+            CMAKE_PREFIX_PATH="/tmp/vcpkg/installed/x64-linux"
+            
+          CIBW_ENVIRONMENT_WINDOWS: |
+            VCPKG_ROOT=C:\vcpkg
+            CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
+            CMAKE_PREFIX_PATH="C:\vcpkg\installed\x64-windows"
+            
+          CIBW_ENVIRONMENT_MACOS: |
+            VCPKG_ROOT=/tmp/vcpkg
+            CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
+            CMAKE_PREFIX_PATH="/tmp/vcpkg/installed/x64-osx"
+            
+          # Platform-specific wheel repair
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair -w {dest_dir} {wheel}"
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} {wheel}"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: ""
+          
         run: |
           python -m cibuildwheel --output-dir wheelhouse
+          
       - name: List built wheels
-        run: ls -l wheelhouse
-
+        run: |
+          echo "Built wheels:"
+          ls -la wheelhouse/
+          echo "Wheel details:"
+          for wheel in wheelhouse/*.whl; do
+            echo "=== $wheel ==="
+            python -m zipfile -l "$wheel" | head -20
+            echo ""
+          done
+          
+      - name: Test wheel installation (basic)
+        run: |
+          python -m pip install wheelhouse/*.whl
+          python -c "import sys; print('Python version:', sys.version)"
+          # Add basic import test for your package here
+          # python -c "import your_package; print('Package imported successfully')"
+          
       - name: Upload wheels
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}-${{ github.run_id }}
           path: wheelhouse/*.whl
+          retention-days: 30
