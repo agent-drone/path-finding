@@ -35,7 +35,7 @@ jobs:
       - name: Build wheels with cibuildwheel
         env:
           # CIBW_SKIP: "pp* *-musllinux*" # Skip PyPy and musllinux builds
-          CIBW_BUILD: "cp311-manylinux_x86_64*"         # Only build for CPython 3.11
+          CIBW_BUILD: "cp311-*"         # Only build for CPython 3.11
           
           # --- Environment variables for cibuildwheel's build environment ---
           # These commands run INSIDE the cibuildwheel Docker container (for Linux)
