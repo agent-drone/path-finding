@@ -33,7 +33,7 @@ jobs:
 
           # For Linux (manylinux) builds:
           CIBW_BEFORE_ALL_LINUX: >
-            yum update -y && yum install -y git cmake unzip curl tar zip &&
+            yum update -y && yum install -y git cmake unzip curl tar zip linux-libc-dev &&
             git clone https://github.com/microsoft/vcpkg.git /tmp/vcpkg &&
             /tmp/vcpkg/bootstrap-vcpkg.sh &&
             /tmp/vcpkg/vcpkg install ompl octomap pybind11 &&
