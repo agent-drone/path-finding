@@ -29,16 +29,19 @@ jobs:
           
           # --- Environment variables for cibuildwheel's build environment ---
           # These commands run INSIDE the cibuildwheel Docker container (for Linux)
+          # which typically uses a manylinux image (often CentOS-based, hence yum)
           # or on the macOS/Windows runner directly (if you add them to the matrix).
 
           # For Linux (manylinux) builds:
           CIBW_BEFORE_ALL_LINUX: >
-            apt update -y && apt install -y git cmake unzip curl tar zip linux-libc-dev &&
-            git clone https://github.com/microsoft/vcpkg.git /tmp/vcpkg &&
-            /tmp/vcpkg/bootstrap-vcpkg.sh &&
-            /tmp/vcpkg/vcpkg install ompl octomap pybind11 &&
-            export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake &&
-            export VCPKG_ROOT=/tmp/vcpkg &&
+            yum update -y && \
+            yum install -y git cmake unzip curl tar zip \
+            kernel-devel-$(uname -r) perl-IPC-Cmd && \
+            git clone https://github.com/microsoft/vcpkg.git /tmp/vcpkg && \
+            /tmp/vcpkg/bootstrap-vcpkg.sh && \
+            /tmp/vcpkg/vcpkg install ompl octomap pybind11 && \
+            export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake && \
+            export VCPKG_ROOT=/tmp/vcpkg && \
             export CMAKE_PREFIX_PATH="/tmp/vcpkg/installed/x64-linux/debug;/tmp/vcpkg/installed/x64-linux/release:${CMAKE_PREFIX_PATH}" 
 
         run: |
