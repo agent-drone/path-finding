@@ -38,8 +38,9 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.23.2
         with:
-          package-dir: py-bindings
+          package-dir: .
         env:
+          CIBW_BEFORE_ALL_LINUX: apt-get update && apt-get install -y libompl-dev liboctomap-dev
           CIBW_ARCHS_MACOS: ${{ matrix.arch }}
           OMPL_BUILD_ARCH: ${{ matrix.arch }}
           CIBW_BUILD: ${{ matrix.pybuilds }}
