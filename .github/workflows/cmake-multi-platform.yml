@@ -50,9 +50,11 @@ jobs:
             
             vcpkg/vcpkg install octomap
             vcpkg/vcpkg install pybind11
+            vcpkg/vcpkg install flann
             vcpkg/vcpkg install ompl
 
-            export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
+            export CMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake
+            
         
           CIBW_ARCHS_MACOS: ${{ matrix.arch }}
           OMPL_BUILD_ARCH: ${{ matrix.arch }}
