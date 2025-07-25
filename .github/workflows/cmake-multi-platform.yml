@@ -43,26 +43,11 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: |
             yum install -y epel-release
             yum install -y cmake make gcc-c++ bzip2 wget git tar sudo
+            yum install -y vcpkg
 
-            boost_version=1.87.0
-            curl -L "https://archives.boost.io/release/${boost_version}/source/boost_${boost_version//./_}.tar.bz2" | tar xj
-            python_include_path=$(python3 -c "from sysconfig import get_paths as gp; print(gp()['include'])")
-            pip install numpy
-            
-            ./bootstrap.sh
-            sudo ./b2 \
-            --with-serialization \
-            --with-filesystem \
-            --with-system \
-            --with-program_options \
-            --with-python \
-            install
-            
-            git clone https://github.com/ompl/ompl.git
-            cd ompl && mkdir -p build/Release && cd build/Release
-            cmake ../.. -DCMAKE_INSTALL_PREFIX=/usr/local
-            make -j$(nproc) && make install
-            cd ../../..
+            git clone https://github.com/microsoft/vcpkg.git
+            bash vcpkg/bootstrap-vcpkg.sh
+            vcpkg/vcpkg install ompl
         
             git clone https://github.com/OctoMap/octomap.git
             cd octomap && mkdir build && cd build
