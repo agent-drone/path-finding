@@ -42,7 +42,7 @@ jobs:
         env:
           CIBW_BEFORE_ALL_LINUX: |
             yum install -y epel-release
-            yum install -y cmake make gcc-c++ bzip2 wget git zip unzip tar
+            yum install -y cmake make gcc-c++ bzip2 wget git zip unzip tar perl-IPC-Cmd
 
             git clone https://github.com/microsoft/vcpkg.git
             bash vcpkg/bootstrap-vcpkg.sh
