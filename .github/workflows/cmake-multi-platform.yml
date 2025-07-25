@@ -47,19 +47,19 @@ jobs:
 
             git clone https://github.com/microsoft/vcpkg.git
             bash vcpkg/bootstrap-vcpkg.sh
+            
+            vcpkg/vcpkg install octomap
+            vcpkg/vcpkg install pybind11
             vcpkg/vcpkg install ompl
-        
-            git clone https://github.com/OctoMap/octomap.git
-            cd octomap && mkdir build && cd build
-            cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
-            make -j$(nproc) && make install
-            cd ../..
+
+            export CMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
         
           CIBW_ARCHS_MACOS: ${{ matrix.arch }}
           OMPL_BUILD_ARCH: ${{ matrix.arch }}
           CIBW_BUILD: ${{ matrix.pybuilds }}
           CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32"
           CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET="15.0"
+
       - uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.arch }}
