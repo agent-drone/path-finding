@@ -1,9 +1,9 @@
 [build-system]
-requires = ["scikit-build-core[pyproject]"]
+requires = ["scikit-build-core", "pybind11", "ninja"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "pathfinder"
+ don't knowname = "pathfinder"
 version = "1.0.0"
 description = "Pathfinder is a wrapper over the famous Octomap and OMPL libraries."
 readme = "README.md"

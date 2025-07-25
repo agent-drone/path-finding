@@ -50,7 +50,6 @@ jobs:
             bash vcpkg/bootstrap-vcpkg.sh
             
             vcpkg/vcpkg install octomap
-            vcpkg/vcpkg install pybind11
             vcpkg/vcpkg install flann
             vcpkg/vcpkg install ompl
             
