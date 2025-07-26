@@ -1,7 +1,5 @@
-cmake_minimum_required(VERSION 3.16)
-project(AIeOS)
-
-set(BUILD_SHARED_LIBS OFF)
+cmake_minimum_required(VERSION 3.28)
+project(pathfinder)
 
 find_package(ompl REQUIRED)
 find_package(octomap REQUIRED)
@@ -16,10 +14,4 @@ target_link_libraries(
     PRIVATE octomap
     PRIVATE ompl::ompl
 )
-
-# add_executable(pathfinder main.cpp ${sources})
-# target_link_libraries(
-#     pathfinder 
-#     PRIVATE octomap
-#     PRIVATE ompl::ompl
-# )
+install(TARGETS pathfinder LIBRARY DESTINATION pathfinder)
