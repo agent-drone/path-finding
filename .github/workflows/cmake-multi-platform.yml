@@ -50,7 +50,6 @@ jobs:
 
       - name: Install cibuildwheel using uv
         run: |
-          uv init
           uv add cibuildwheel
           env:
             CIBW_BEFORE_BUILD: echo "vcpkg installed"
