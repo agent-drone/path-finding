@@ -35,34 +35,28 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Install and configure vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+          ./vcpkg/vcpkg install ompl octomap
+
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH  # For Linux/macOS
         shell: bash
 
+
       - name: Install cibuildwheel using uv
         run: |
+          uv init
           uv add cibuildwheel
-        env:
-            CIBW_BEFORE_ALL_LINUX: |
-              yum install -y epel-release
-              yum install -y cmake make gcc-c++ bzip2 wget git zip unzip tar perl-IPC-Cmd autoconf
-              yum install -y libtool intltool automake autoconf-archive gettext perl-FindBin
-   
-              git clone https://github.com/microsoft/vcpkg.git
-              bash vcpkg/bootstrap-vcpkg.sh
-              
-              vcpkg/vcpkg install octomap
-              vcpkg/vcpkg install flann
-              vcpkg/vcpkg install ompl
-
-            CIBW_ARCHS_MACOS: ${{ matrix.arch }}
-            OMPL_BUILD_ARCH: ${{ matrix.arch }}
+          env:
+            CIBW_BEFORE_BUILD: echo "vcpkg installed"
+            CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
             CIBW_BUILD: ${{ matrix.pybuilds }}
             CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32"
-            CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET="15.0"
-            CIBW_ENVIRONMENT_LINUX: CMAKE_TOOLCHAIN_FILE=/project/vcpkg/scripts/buildsystems/vcpkg.cmake CMAKE_BUILD_TYPE=Debug
 
       - name: Build wheels
         run: |
