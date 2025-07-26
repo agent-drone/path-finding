@@ -29,11 +29,50 @@ jobs:
           pybuilds: cp3{10,11,12,13}-macosx_arm64
           arch: arm64
           id: macos_arm64
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
+          submodules: recursive
+
+      - name: Cache vcpkg for octomap
+        if: contains(matrix.os, 'ubuntu')
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/vcpkg/installed
+            ~/vcpkg/buildtrees/octomap
+            ~/vcpkg/packages/octomap_*
+          key: vcpkg-octomap-${{ matrix.id }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-octomap-${{ matrix.id }}-
+
+      - name: Cache vcpkg for flann
+        if: contains(matrix.os, 'ubuntu')
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/vcpkg/buildtrees/flann
+            ~/vcpkg/packages/flann_*
+          key: vcpkg-flann-${{ matrix.id }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-flann-${{ matrix.id }}-
+
+      - name: Cache vcpkg for ompl
+        if: contains(matrix.os, 'ubuntu')
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/vcpkg/buildtrees/ompl
+            ~/vcpkg/packages/ompl_*
+          key: vcpkg-ompl-${{ matrix.id }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-ompl-${{ matrix.id }}-
+
+      - name: Set up cache for CMake
+        uses: actions/cache@v4
+        with:
+          path: build/
+          key: cmake-${{ matrix.id }}-${{ hashFiles('CMakeLists.txt') }}
+          restore-keys: cmake-${{ matrix.id }}-
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.23.2
@@ -44,22 +83,20 @@ jobs:
             yum install -y epel-release
             yum install -y cmake make gcc-c++ bzip2 wget git zip unzip tar perl-IPC-Cmd autoconf
             yum install -y libtool intltool automake autoconf-archive gettext perl-FindBin
- 
 
-            git clone https://github.com/microsoft/vcpkg.git
-            bash vcpkg/bootstrap-vcpkg.sh
-            
-            vcpkg/vcpkg install octomap
-            vcpkg/vcpkg install flann
-            vcpkg/vcpkg install ompl
-            
-        
+            git clone https://github.com/microsoft/vcpkg.git ~/vcpkg
+            bash ~/vcpkg/bootstrap-vcpkg.sh
+
+            ~/vcpkg/vcpkg install octomap
+            ~/vcpkg/vcpkg install flann
+            ~/vcpkg/vcpkg install ompl
+
           CIBW_ARCHS_MACOS: ${{ matrix.arch }}
           OMPL_BUILD_ARCH: ${{ matrix.arch }}
           CIBW_BUILD: ${{ matrix.pybuilds }}
           CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32"
           CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET="15.0"
-          CIBW_ENVIRONMENT_LINUX: CMAKE_TOOLCHAIN_FILE=/project/vcpkg/scripts/buildsystems/vcpkg.cmake CMAKE_BUILD_TYPE=Debug
+          CIBW_ENVIRONMENT_LINUX: CMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake CMAKE_BUILD_TYPE=Debug
 
       - uses: actions/upload-artifact@v4
         with:
