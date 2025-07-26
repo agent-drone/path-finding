@@ -14,9 +14,15 @@ pybind11_add_module(pathfinder ${sources})
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
-set_target_properties(pathfinder PROPERTIES
-    INSTALL_RPATH "$ORIGIN"
-)
+if(APPLE)
+    set_target_properties(pathfinder PROPERTIES
+        INSTALL_RPATH "@executable_path"
+    )
+else()
+    set_target_properties(pathfinder PROPERTIES
+        INSTALL_RPATH "$ORIGIN"
+    )
+endif()
 target_link_libraries(
     pathfinder
     PRIVATE octomap
