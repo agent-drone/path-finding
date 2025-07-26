@@ -1,25 +1,18 @@
 [build-system]
-requires = ["scikit-build-core", "pybind11", "ninja"]
+requires = ["scikit-build-core", "pybind11"]
 build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+wheel.install-dir = "."
 
 [project]
 name = "pathfinder"
 version = "1.0.0"
 description = "Pathfinder is a wrapper over the famous Octomap and OMPL libraries."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = "==3.12.*"
 license = {text = "UNKNOWN"}
 authors = []
 dependencies = [
-    "auditwheel>=6.4.1",
-    "cibuildwheel>=3.0.1",
-    "patchelf>=0.17.2.2",
-    "pybind11>=3.0.0",
-    "scikit-build-core[pyproject]>=0.11.5",
-    "setuptools>=80.9.0",
-    "twine>=6.1.0",
-    "wheel>=0.45.1",
+    "cibuildwheel>=3.1.1",
 ]
-
-[tool.scikit-build]
-wheel.install-dir = "."
