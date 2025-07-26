@@ -12,9 +12,10 @@ find_package(pybind11 REQUIRED)
 
 pybind11_add_module(pathfinder ${sources})
 
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
 set_target_properties(pathfinder PROPERTIES
     INSTALL_RPATH "$ORIGIN"
-    BUILD_WITH_INSTALL_RPATH TRUE
 )
 target_link_libraries(
     pathfinder
