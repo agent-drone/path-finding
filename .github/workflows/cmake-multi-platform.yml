@@ -43,7 +43,7 @@ jobs:
         env:
           CIBW_BUILD: ${{ matrix.pybuilds }}
           CIBW_BEFORE_ALL: yum install -y curl zip tar unzip epel-release cmake make gcc-c++ bzip2 wget git zip unzip tar perl-IPC-Cmd autoconf libtool intltool automake autoconf-archive gettext && git clone https://github.com/microsoft/vcpkg.git && ./vcpkg/bootstrap-vcpkg.sh
-          CIBW_BEFORE_BUILD: ./vcpkg/vcpkg install octomap && ./vcpkg/vcpkg install ompl 
+          CIBW_BEFORE_BUILD: ./vcpkg/vcpkg install octomap && ./vcpkg/vcpkg install ompl
           CIBW_ENVIRONMENT: CMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake"
           CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32"       
 
