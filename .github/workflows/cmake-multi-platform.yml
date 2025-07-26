@@ -43,6 +43,9 @@ jobs:
           CIBW_BUILD:  ${{ matrix.pybuilds }}
           CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32"
           CIBW_BEFORE_ALL_LINUX: > 
+            yum install -y epel-release **
+            yum install -y cmake make gcc-c++ bzip2 wget git zip unzip tar perl-IPC-Cmd autoconf &&
+            yum install -y libtool intltool automake autoconf-archive gettext perl-FindBin &&
             git clone https://github.com/microsoft/vcpkg.git &&
             ./vcpkg/bootstrap-vcpkg.sh &&
             ./vcpkg/vcpkg integrate install &&
