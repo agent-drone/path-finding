@@ -35,31 +35,44 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Install and configure vcpkg
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-          ./vcpkg/bootstrap-vcpkg.sh
-          ./vcpkg/vcpkg install ompl octomap
-
-      - name: Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH  # For Linux/macOS
-        shell: bash
-
-
-      - name: Install cibuildwheel using uv
-        run: |
-          uv add cibuildwheel
-          env:
-            CIBW_BEFORE_BUILD: echo "vcpkg installed"
-            CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-            CIBW_BUILD: ${{ matrix.pybuilds }}
-            CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32"
-
       - name: Build wheels
-        run: |
-          uv run cibuildwheel --output-dir wheelhouse
+        uses: pypa/cibuildwheel@v3.1.1
+        with:
+          output-dir: wheelhouse
+        env:
+          CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
+          CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32"
+          CIBW_BEFORE_ALL_LINUX: > 
+            git clone https://github.com/microsoft/vcpkg.git &&
+            ./vcpkg/bootstrap-vcpkg.sh &&
+            ./vcpkg/vcpkg integrate install &&
+            ./vcpkg/vcpkg install ompl octomap            
+
+      # - name: Install and configure vcpkg
+      #   run: |
+      #     git clone https://github.com/microsoft/vcpkg.git
+      #     ./vcpkg/bootstrap-vcpkg.sh
+      #     ./vcpkg/vcpkg install ompl octomap
+
+      # - name: Install uv
+      #   run: |
+      #     curl -LsSf https://astral.sh/uv/install.sh | sh
+      #     echo "$HOME/.cargo/bin" >> $GITHUB_PATH  # For Linux/macOS
+      #   shell: bash
+
+
+      # - name: Install cibuildwheel using uv
+      #   run: |
+      #     uv add cibuildwheel
+      #     env:
+      #       CIBW_BEFORE_BUILD: echo "vcpkg installed"
+      #       CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+      #       CIBW_BUILD: ${{ matrix.pybuilds }}
+      #       CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32"
+
+      # - name: Build wheels
+      #   run: |
+      #     uv run cibuildwheel --output-dir wheelhouse
           
       - uses: actions/upload-artifact@v4
         with:
