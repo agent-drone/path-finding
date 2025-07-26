@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
+set(BUILD_SHARED_LIBS OFF)
+
 project(pathfinder)
 
 include_directories(include)
