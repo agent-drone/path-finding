@@ -43,9 +43,9 @@ jobs:
         env:
           CIBW_BUILD: ${{ matrix.pybuilds }}
           CIBW_BEFORE_BUILD_MACOS: brew update && brew install cmake boost eigen wget git && git clone https://github.com/microsoft/vcpkg.git && ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/vcpkg install octomap && ./vcpkg/vcpkg install ompl 
-          CIBW_BEFORE_BUILD_LINUX: yum install -y curl zip tar unzip epel-release cmake make gcc-c++ bzip2 wget git zip unzip tar perl-IPC-Cmd autoconf libtool intltool automake autoconf-archive gettext && git clone https://github.com/microsoft/vcpkg.git && ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/vcpkg install octomap && ./vcpkg/vcpkg install ompl
-          CIBW_ENVIRONMENT_LINUX: CMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" PIP_USE_DEPRECATED="out-of-tree-build"
-          CIBW_ENVIRONMENT_MACOS: CMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" PIP_USE_DEPRECATED="out-of-tree-build"
+          CIBW_BEFORE_BUILD_LINUX: yum install -y curl zip tar unzip epel-release cmake make gcc-c++ bzip2 wget git zip unzip tar perl-IPC-Cmd autoconf libtool intltool automake autoconf-archive gettext && git clone https://github.com/microsoft/vcpkg.git && ./vcpkg/bootstrap-vcpkg.sh && ./vcpkg/vcpkg install octomap && ./vcpkg/vcpkg install ompl && rm -f /project/vcpkg/packages/ompl_x64-linux/lib/libompl.so && rm -f /project/vcpkg/packages/ompl_x64-linux/lib/libompl.so.18 && cp /project/vcpkg/packages/ompl_x64-linux/lib/libompl.so.1.7.0 /project/vcpkg/packages/ompl_x64-linux/lib/libompl.so.18 && cp /project/vcpkg/packages/ompl_x64-linux/lib/libompl.so.1.7.0 /project/vcpkg/packages/ompl_x64-linux/lib/libompl.so.18
+          CIBW_ENVIRONMENT_LINUX: CMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake"
+          CIBW_ENVIRONMENT_MACOS: CMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake"
           CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32" 
 
       - uses: actions/upload-artifact@v4
