@@ -48,8 +48,8 @@ Wompl::criterion(double sampling_dist, double minimum_volume)
     y = pos->values[1];
     z = pos->values[2]; 
     octomap::point3d center(x, y, z);
-    octomap::point3d min_bound = center - octomap::point3d(sampling_dist, sampling_dist, sampling_dist);
-    octomap::point3d max_bound = center + octomap::point3d(sampling_dist, sampling_dist, sampling_dist);
+    octomap::point3d min_bound = center - octomap::point3d(minimum_volume, minimum_volume, minimum_volume);
+    octomap::point3d max_bound = center + octomap::point3d(minimum_volume, minimum_volume, minimum_volume);
 
     for (auto it = wp->otree.begin_leafs_bbx(min_bound, max_bound), end = wp->otree.end_leafs_bbx(); it != end; ++it)
     {
