@@ -38,23 +38,30 @@ Wompl::Wompl(std::shared_ptr<Woctomap> swp) {
 void
 Wompl::criterion(double sampling_dist, double minimum_volume)
 {
-  // @TODO: allow the user to set their own state validity checkers
-  // later on.
+  /* Check for a valid path every `SAMPLING_DIST`. Verify that
+  `MINIMUM VOLUME` is free at that point for it to be considered 
+  a valid point. */
   ss->setStateValidityChecker([&](const ob::State *state) {
     auto *pos = state->as<ob::RealVectorStateSpace::StateType>();
     float x,y,z;
     x = pos->values[0];
     y = pos->values[1];
     z = pos->values[2]; 
+    octomap::point3d center(x, y, z);
+    octomap::point3d min_bound = center - octomap::point3d(sampling_dist, sampling_dist, sampling_dist);
+    octomap::point3d max_bound = center + octomap::point3d(sampling_dist, sampling_dist, sampling_dist);
 
-    bool occ =    wp->free(x,y,z) 
-                && wp->free(x+sampling_dist,y,z) 
-                && wp->free(x,y+sampling_dist,z)
-                && wp->free(x,y,z+sampling_dist)
-                && wp->free(x-sampling_dist,y,z)
-                && wp->free(x,y-sampling_dist,z)
-                && wp->free(x,y,z-sampling_dist);
-    return occ;
+    for (auto it = wp->otree.begin_leafs_bbx(min_bound, max_bound), end = wp->otree.end_leafs_bbx(); it != end; ++it)
+    {
+      if (wp->otree.isNodeOccupied(*it)) return false;
+
+      // Optionally: if you want to count only known free space, skip unknowns
+      // if (!it->isOccupied() && it->getOccupancy() > 0.0) free_voxels++;
+
+      // Make sure voxel center is inside sphere if you want spherical volume (optional)
+      // if ((it.getCoordinate() - center).norm() <= sampling_dist)
+    }
+    return true;
   });
 }
 

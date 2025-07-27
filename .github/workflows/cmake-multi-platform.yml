@@ -1,3 +1,6 @@
+# This is the platform file used by github-actions to build
+# platform agnostic `.whl` files required by python.
+
 name: Build Wheels
 on:
   workflow_dispatch:
