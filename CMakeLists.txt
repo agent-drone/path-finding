@@ -16,7 +16,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
 if(APPLE)
     set_target_properties(pathfinder PROPERTIES
-        INSTALL_RPATH "@executable_path"
+        INSTALL_RPATH "@loader_path"
     )
 else()
     set_target_properties(pathfinder PROPERTIES
