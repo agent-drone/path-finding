@@ -53,7 +53,7 @@ jobs:
             ./vcpkg/vcpkg install ompl
             
           CIBW_ENVIRONMENT_LINUX: CMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/project/vcpkg/packages/ompl_x64-linux/lib/"
-          CIBW_ENVIRONMENT_MACOS: CMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:/project/vcpkg/packages/ompl_x64-linux/lib/"
+          CIBW_ENVIRONMENT_MACOS: CMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:/project/vcpkg/packages/ompl_x64-osx/lib/"
           CIBW_SKIP: "cp*-manylinux_i686 cp*-musllinux* cp*-win32" 
 
       - uses: actions/upload-artifact@v4
