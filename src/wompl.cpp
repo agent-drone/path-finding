@@ -16,6 +16,7 @@ DESCRIPTION
 #include <ompl/geometric/GeneticSearch.h>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/planners/rrt/RRTstar.h>
+#include <ompl/geometric/planners/prm/PRMstar.h>
 
 #include <algorithm>
 #include <array>
@@ -34,7 +35,7 @@ Wompl::Wompl(std::shared_ptr<Woctomap> swp) {
   this->ss = std::make_shared<og::SimpleSetup>(space);
   space->setBounds(-200, 200); // @TODO: allow user to configure this later on!
 
-  this->rrt = std::make_shared<og::RRTstar>(ss->getSpaceInformation());
+  this->rrt = std::make_shared<og::PRMstar>(ss->getSpaceInformation());
   ss->setPlanner(rrt);
 }
 
@@ -59,35 +60,24 @@ void Wompl::criterion(double sampling_dist, double clearance_radius) {
   //   throw std::runtime_error(oss.str());
   // }
 
-  rrt->setRange(sampling_dist);
+  this->bubble = clearance_radius;
+
   ss->setStateValidityChecker([&](const ob::State *state) {
     auto *pos = state->as<ob::RealVectorStateSpace::StateType>();
 
-    POINT center(pos->values[0], pos->values[1], pos->values[2]);
-    POINT min_bound = center - POINT(
-      clearance_radius, clearance_radius, clearance_radius);
-    POINT max_bound = center + POINT(
-        clearance_radius, clearance_radius, clearance_radius);
+    float x,y,z;
+    x = pos->values[0];
+    y = pos->values[1];
+    z = pos->values[2];
+    if (z <= 1) return false;
+
+    POINT center(x, y, z);
+
+    POINT min_bound = center - POINT(bubble, bubble, bubble);
+    POINT max_bound = center + POINT(bubble, bubble, bubble);
 
     for (auto it = wp->otree.begin_leafs_bbx(min_bound, max_bound), end = wp->otree.end_leafs_bbx(); it != end; it++) {
-      double half_voxel_size = it.getSize() / 2.0;
-
-      POINT voxel_center = it.getCoordinate();
-
-      POINT closest_point_on_voxel;
-      closest_point_on_voxel.x() = std::max((float)(voxel_center.x() - half_voxel_size), (float)std::min((float)center.x(), float(voxel_center.x() + half_voxel_size)));
-      closest_point_on_voxel.y() = std::max((float)(voxel_center.y() - half_voxel_size), (float)std::min((float)center.y(), float(voxel_center.y() + half_voxel_size)));
-      closest_point_on_voxel.z() = std::max((float)(voxel_center.z() - half_voxel_size), (float)std::min((float)center.z(), float(voxel_center.z() + half_voxel_size)));
-
-      double dist_sq = (closest_point_on_voxel - center).norm_sq();
-      double clearance_radius_sq = clearance_radius * clearance_radius;
-      if (wp->otree.isNodeOccupied(*it)) {
-        /* verify that the occupied octree node is 
-        * *actually* in our avoidance radius. */
-        if (dist_sq < clearance_radius_sq) { 
-          return false;
-        }
-      }
+      if (wp->otree.isNodeOccupied(*it)) return false;
     }
     return true;
   });
@@ -117,10 +107,12 @@ Wompl::solve(float limit) {
 }
 
 std::vector<std::array<double, 3>>
-Wompl::get_computed_waypoints() 
+Wompl::get_computed_waypoints(int interpolate = 10) 
 {
     std::vector<std::array<double, 3>> ret = {};
     auto pts = ss->getSolutionPath();
+    pts.interpolate(interpolate);
+  
     for (int i = 0; i < pts.getStateCount(); i++) {
       float x, y, z;
       auto *cs = pts.getState(i)->as<ob::RealVectorStateSpace::StateType>();
